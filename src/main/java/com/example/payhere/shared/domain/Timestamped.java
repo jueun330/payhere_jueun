@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Timestamped {
 

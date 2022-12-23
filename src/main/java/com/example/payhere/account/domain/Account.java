@@ -6,7 +6,6 @@ import com.example.payhere.shared.domain.Timestamped;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -17,7 +16,7 @@ public class Account extends Timestamped {
 
     // 고유 아이디
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
     // 메모
@@ -31,14 +30,6 @@ public class Account extends Timestamped {
     // 삭제 여부
     @Column
     private Boolean deleted = Boolean.FALSE;
-
-    // 작성 시간
-    @Column
-    private LocalDateTime createdAt;
-
-    // 수정 시간
-    @Column
-    private LocalDateTime modifiedAt;
 
     // 회원 정보
     @JoinColumn(name = "memberId", nullable = false)

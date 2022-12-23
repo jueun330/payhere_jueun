@@ -7,7 +7,6 @@ import com.example.payhere.account.repository.AccountRepository;
 import com.example.payhere.member.domain.Member;
 import com.example.payhere.shared.domain.PrivateResponseBody;
 import com.example.payhere.shared.domain.StatusCode;
-import com.example.payhere.shared.exception.PrivateException;
 import com.example.payhere.shared.jwt.TokenProvider;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.payhere.account.domain.QAccount.account;
 
@@ -44,6 +44,7 @@ public class AccountService {
                 .member(member)
                 .money(requestDto.getMoney())
                 .memo(requestDto.getMemo())
+                .deleted(Boolean.FALSE)
                 .build();
 
         // repo에 저장
@@ -61,16 +62,16 @@ public class AccountService {
         Member member = authorizeToken(request);
 
         // 수정할 가계부 찾기
-        Account account = accountRepository.findById(accountId).get();
-
-        // 작성자가 아닐 때 에러 메시지 반환
-        if (account.validateMember(member)) {
-            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.BAD_REQUEST, null), HttpStatus.OK);
-        }
+        Account account = isPresentAccount(accountId);
 
         // 수정할 가계부가 존재하지 않을 때 에러 메시지 반환
         if (null == account) {
             return new ResponseEntity<>(new PrivateResponseBody(StatusCode.NOT_FOUND, null), HttpStatus.OK);
+        }
+
+        // 작성자가 아닐 때 에러 메시지 반환
+        if (!account.validateMember(member)) {
+            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.BAD_REQUEST, null), HttpStatus.OK);
         }
 
         // 내용 수정
@@ -96,16 +97,16 @@ public class AccountService {
         Member member = authorizeToken(request);
 
         // 삭제할 가계부 찾기
-        Account account = accountRepository.findById(accountId).get();
-
-        // 작성자가 아닐 때 에러 메시지 반환
-        if (account.validateMember(member)) {
-            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.BAD_REQUEST, null), HttpStatus.OK);
-        }
+        Account account = isPresentAccount(accountId);
 
         // 삭제할 가계부가 존재하지 않을 때 에러 메시지 반환
         if (null == account) {
             return new ResponseEntity<>(new PrivateResponseBody(StatusCode.NOT_FOUND, null), HttpStatus.OK);
+        }
+
+        // 작성자가 아닐 때 에러 메시지 반환
+        if (!account.validateMember(member)) {
+            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.BAD_REQUEST, null), HttpStatus.OK);
         }
 
         // 삭제 처리
@@ -208,23 +209,19 @@ public class AccountService {
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, responseDto), HttpStatus.OK);
     }
 
-    // 토큰 확인
+    // 작성자 확인
+    @Transactional
     public Member authorizeToken(HttpServletRequest request) {
-
-        // Access 토큰 유효성 확인
-        if (request.getHeader("Authorization") == null) {
-            throw new PrivateException(StatusCode.LOGIN_WRONG_SIGNATURE_JWT_TOKEN);
-        }
-
-        // Refresh 토큰 유요성 확인
         if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-            throw new PrivateException(StatusCode.LOGIN_WRONG_SIGNATURE_JWT_TOKEN);
+            return null;
         }
+        return tokenProvider.getMemberFromAuthentication();
+    }
 
-        // Access, Refresh 토큰 유효성 검증이 완료되었을 경우 인증된 유저 정보 저장
-        Member member = tokenProvider.getMemberFromAuthentication();
-
-        // 인증된 유저 정보 반환
-        return member;
+    // 존재하는 가계부인지 여부 확인
+    @Transactional(readOnly = true)
+    public Account isPresentAccount(Long accountId) {
+        Optional<Account> optionalAccount = accountRepository.findById(accountId);
+        return optionalAccount.orElse(null);
     }
 }
