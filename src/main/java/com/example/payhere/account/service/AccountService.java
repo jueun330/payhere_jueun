@@ -3,10 +3,8 @@ package com.example.payhere.account.service;
 import com.example.payhere.account.controller.dto.AccountRequestDto;
 import com.example.payhere.account.controller.dto.AccountResponseDto;
 import com.example.payhere.account.domain.Account;
-import com.example.payhere.account.domain.QAccount;
 import com.example.payhere.account.repository.AccountRepository;
 import com.example.payhere.member.domain.Member;
-import com.example.payhere.member.repository.MemberRepository;
 import com.example.payhere.shared.domain.PrivateResponseBody;
 import com.example.payhere.shared.domain.StatusCode;
 import com.example.payhere.shared.exception.PrivateException;
@@ -18,21 +16,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import static com.example.payhere.account.domain.QAccount.account;
-import static com.example.payhere.member.domain.QMember.member;
 
 @RequiredArgsConstructor
 @Service
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -54,13 +49,8 @@ public class AccountService {
         // repo에 저장
         accountRepository.save(account);
 
-        // 반환 값
-        AccountResponseDto responseDto = AccountResponseDto.builder()
-                .money(requestDto.getMoney())
-                .memo(requestDto.getMemo())
-                .build();
-
-        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, responseDto), HttpStatus.OK);
+        // Message 및 Status를 Return
+        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK,"가계부 작성 완료"), HttpStatus.OK);
     }
 
     // 가계부 수정
@@ -72,6 +62,11 @@ public class AccountService {
 
         // 수정할 가계부 찾기
         Account account = accountRepository.findById(accountId).get();
+
+        // 작성자가 아닐 때 에러 메시지 반환
+        if (account.validateMember(member)) {
+            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.BAD_REQUEST, null), HttpStatus.OK);
+        }
 
         // 수정할 가계부가 존재하지 않을 때 에러 메시지 반환
         if (null == account) {
@@ -88,6 +83,7 @@ public class AccountService {
                 .memo(requestDto.getMemo())
                 .build();
 
+        // Data 및 Status를 Return
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, responseDto), HttpStatus.OK);
     }
 
@@ -102,6 +98,11 @@ public class AccountService {
         // 삭제할 가계부 찾기
         Account account = accountRepository.findById(accountId).get();
 
+        // 작성자가 아닐 때 에러 메시지 반환
+        if (account.validateMember(member)) {
+            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.BAD_REQUEST, null), HttpStatus.OK);
+        }
+
         // 삭제할 가계부가 존재하지 않을 때 에러 메시지 반환
         if (null == account) {
             return new ResponseEntity<>(new PrivateResponseBody(StatusCode.NOT_FOUND, null), HttpStatus.OK);
@@ -110,6 +111,7 @@ public class AccountService {
         // 삭제 처리
         account.delete();
 
+        // Message 및 Status를 Return
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, "가계부 삭제 완료!"), HttpStatus.OK);
     }
 
@@ -138,6 +140,7 @@ public class AccountService {
                             .build());
         }
 
+        // Data 및 Status를 Return
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, responseDtoList), HttpStatus.OK);
     }
 
@@ -168,6 +171,7 @@ public class AccountService {
                             .build());
         }
 
+        // Data 및 Status를 Return
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, responseDtoList), HttpStatus.OK);
     }
 
@@ -180,6 +184,11 @@ public class AccountService {
 
         // 복구할 가계부 찾기
         Account account = accountRepository.findById(accountId).get();
+
+        // 작성자가 아닐 때 에러 메시지 반환
+        if (account.validateMember(member)) {
+            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.BAD_REQUEST, null), HttpStatus.OK);
+        }
 
         // 복구할 가계부가 존재하지 않을 때 에러 메시지 반환
         if (null == account) {
@@ -195,6 +204,7 @@ public class AccountService {
                 .memo(account.getMemo())
                 .build();
 
+        // Data 및 Status를 Return
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, responseDto), HttpStatus.OK);
     }
 

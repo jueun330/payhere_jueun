@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountRequestDto {
 
+    // 지출 내역
     private Integer money;
+
+    // 메모
     private String memo;
 }

@@ -40,7 +40,7 @@ public class MemberService {
         // 비밀번호 확인
         if (!requestDto.getPw().equals(requestDto.getPwConfirm())) {
             return new ResponseEntity<>(new PrivateResponseBody
-                    (StatusCode.DUPLICATED_PASSWORD, null), HttpStatus.OK);
+                    (StatusCode.LOGIN_PASSWORD_FAIL, null), HttpStatus.OK);
         }
 
         // 회원 정보 저장

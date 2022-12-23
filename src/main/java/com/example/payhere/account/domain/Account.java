@@ -29,7 +29,7 @@ public class Account extends Timestamped {
     private Integer money;
 
     // 삭제 여부
-    @Column(nullable = false)
+    @Column
     private Boolean deleted = Boolean.FALSE;
 
     // 작성 시간
@@ -45,16 +45,24 @@ public class Account extends Timestamped {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Member member;
 
+    // 수정
     public void update(AccountRequestDto requestDto){
         this.money = requestDto.getMoney();
         this.memo = requestDto.getMemo();
     }
 
+    // 삭제
     public void delete(){
         this.deleted = Boolean.TRUE;
     }
 
+    // 복구
     public void restore(){
         this.deleted = Boolean.FALSE;
+    }
+
+    // 회원 확인
+    public boolean validateMember(Member member) {
+        return !this.member.equals(member);
     }
 }
