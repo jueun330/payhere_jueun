@@ -5,6 +5,7 @@ import com.example.payhere.account.service.AccountService;
 import com.example.payhere.shared.domain.PrivateResponseBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +21,8 @@ public class AccountController {
     // 가계부 작성
     @ResponseBody
     @PostMapping(value = "/accounts")
-    public ResponseEntity<PrivateResponseBody> createAccount(@RequestBody AccountRequestDto requestDto, HttpServletRequest request) {
-        return accountService.createAccount(requestDto, request);
+    public ResponseEntity<PrivateResponseBody> createAccount(@RequestBody AccountRequestDto requestDto, @AuthenticationPrincipal Long memberId) {
+        return accountService.createAccount(requestDto, memberId);
     }
 
     // 가계부 수정

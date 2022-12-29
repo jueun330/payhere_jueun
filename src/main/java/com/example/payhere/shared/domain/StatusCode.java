@@ -12,8 +12,7 @@ public enum StatusCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "113", "가계부 작성자가 아닙니다."),
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST,"114","중복된 Email이 있습니다."),
     NOT_FOUND(HttpStatus.BAD_REQUEST,"115","존재하지 않는 가계부 id 입니다."),
-
-    INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , bangjueun62@gmail.com 으로 연락 부탁드립니다.");
+    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "116", "금액을 입력하여 주세요.");
 
     private final HttpStatus httpStatus;
     private final String statusCode;

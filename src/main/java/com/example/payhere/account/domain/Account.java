@@ -32,7 +32,7 @@ public class Account extends Timestamped {
     private Boolean deleted = Boolean.FALSE;
 
     // 회원 정보
-    @JoinColumn(name = "memberId", nullable = false)
+    @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Member member;
 

@@ -112,7 +112,7 @@ class MemberControllerTest {
                                 .with(csrf()) // 403 에러를 방지하기 위한 csrf
                                 .contentType(MediaType.APPLICATION_JSON)// json 형식으로 데이터를 보낸다고 명시
                                 .content(json))
-                        .andExpect(status().isNonAuthoritativeInformation()) // 에러 코드 반환
+                        .andExpect(status().is4xxClientError()) // 에러 코드 반환
                         .andDo(print()); // 요청과 응답 정보 전체 출력
             }
 
@@ -137,19 +137,18 @@ class MemberControllerTest {
                                 .with(csrf()) // 403 에러를 방지하기 위한 csrf
                                 .contentType(MediaType.APPLICATION_JSON)// json 형식으로 데이터를 보낸다고 명시
                                 .content(json))
-                        .andExpect(status().isNonAuthoritativeInformation()) // 에러 코드 반환
+                        .andExpect(status().is4xxClientError()) // 에러 코드 반환
                         .andDo(print()); // 요청과 응답 정보 전체 출력
             }
         }
     }
 
     @Test
-    @WithUserDetails(value = "user1@test.com")
     @DisplayName("로그아웃 성공")
     void logout() throws Exception {
 
         // api 전송
-        mvc.perform(post("/ph/logout")// 요청 전송
+        mvc.perform(post("/ph/logout").header("Refresh-Token" , "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NzI4Mzg5NTd9.7x96zLcUkeXIflLXhUPUt8j_vUn8IFnOzcGQA8L8R88")// 요청 전송
                         .with(csrf())) // 403 에러를 방지하기 위한 csrf
                 .andExpect(status().isOk()) // 성공 코드 반환
                 .andDo(print()); // 요청과 응답 정보 전체 출력

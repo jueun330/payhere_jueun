@@ -19,7 +19,7 @@ public class RefreshToken extends Timestamped {
     @Column(nullable = false)
     private Long id;
 
-    @JoinColumn(name = "memberId", nullable = false)
+    @JoinColumn(name = "memberId", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @OneToOne(fetch = FetchType.LAZY)
     private Member member;
 
