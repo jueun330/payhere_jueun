@@ -1,0 +1,36 @@
+CREATE DATABASE ph;
+
+CREATE TABLE member (
+  'member_id' bigint NOT NULL AUTO_INCREMENT,
+  'created_at' datetime(6) DEFAULT NULL,
+  'modified_at' datetime(6) DEFAULT NULL,
+  'email' varchar(255) NOT NULL,
+  'pw' varchar(255) NOT NULL,
+  PRIMARY KEY ('member_id')
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE account (
+  'account_id' bigint NOT NULL AUTO_INCREMENT,
+  'created_at' datetime(6) DEFAULT NULL,
+  'modified_at' datetime(6) DEFAULT NULL,
+  'deleted' bit(1) DEFAULT NULL,
+  'memo' varchar(255) DEFAULT NULL,
+  'money' int DEFAULT NULL,
+  PRIMARY KEY ('account_id')
+  CONSTRAINT 'member_id' FOREIGN KEY ('member') REFERENCES 'member' ('member_id') ON DELETE CASCADE
+) NGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE refresh_token (
+  'id' bigint NOT NULL,
+  'created_at' datetime(6) DEFAULT NULL,
+  'modified_at' datetime(6) DEFAULT NULL,
+  'value' varchar(255) NOT NULL,
+  PRIMARY KEY ('id')
+  CONSTRAINT 'member_id' FOREIGN KEY ('member') REFERENCES 'member' ('member_id') ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+INSERT INTO member (member_id, created_at, modified_at, email, pw) VALUE (7, NOW(), NOW(), 'test00@test.com', 'asdf1234');
+INSERT INTO member (member_id, created_at, modified_at, email, pw) VALUE (10, NOW(), NOW(), 'user1@test.com', 'asdf1234');
+
